@@ -1,2 +1,2 @@
 # QTX-reader
-module to read qtx files &amp; deduce the color
+Software to read qtx files & represent color based on the reflectance values of the color standard.
