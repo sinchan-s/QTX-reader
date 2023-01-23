@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import streamlit as st
+from io import StringIO
 
 # basic configurations
 st.set_page_config(
@@ -13,39 +14,34 @@ st.set_page_config(
 
 st.header("QTX file reader & color-graph display")
 
-qtx_file = st.file_uploader("Upload qtx format file only", type=['qtx', 'QTX'], accept_multiple_files=False,
+
+# QTX file uploader
+qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=False,
                             help="Only upload QTX file")
 
-
-# def qtx_reader(qfile):
-with open('test.QTX') as f:
-    lines = f.read()
-    z = re.findall("STD_REFLLOW=(\d+),", lines)
-    a = re.findall("STD_REFLPOINTS=(\d+),", lines)
-    b = re.findall("STD_REFLINTERVAL=(\d+),", lines)
-    c = re.findall("STD_R[=,](.+)", lines)
-    if z:
-        for i, j in enumerate(z):
-            ref_low = int(z[i])
-            ref_pts = int(a[i])
-            ref_intv = int(b[i])
-            ref_val_list = str(c[i]).split(',')
-            wave_list = [k for k in range(ref_low, ref_low + ref_pts * ref_intv, ref_intv)]
-            # print('Wavelength values: ', wave_list)
-            # print('Reflectance values: ', ref_val_list)
-            sd_df = pd.DataFrame(ref_val_list, index=wave_list, columns=['ref_val'])
-            sd_df['ref_val'] = sd_df['ref_val'].astype('float64')
-            print(sd_df)
-            st.write(sd_df.info())
-            # st.pyplot(sd_df)
-
-'''
+# QTX file opener
 try:
-    if qtx_file is not None:
-        st.write("File Preview:")
-        qtx_reader(qtx_file)
-        # q_file = QtxReader(file_upload)
-        # QtxReader.val_finder()
+    # converting qtx data to raw string
+    stringio = StringIO(qtx_file.getvalue().decode("utf-8"))
+    string_data = stringio.read()
+    with st.expander('Raw data: ', expanded=False):
+        st.write(string_data)
+    # values extraction using regex
+    std_name = re.findall("STD_NAME=(.+)", string_data)
+    list_ref_low = re.findall("STD_REFLLOW=(\d+),", string_data)
+    list_ref_pts = re.findall("STD_REFLPOINTS=(\d+),", string_data)
+    list_ref_int = re.findall("STD_REFLINTERVAL=(\d+),", string_data)
+    list_ref_vals = re.findall("STD_R[=,](.+)", string_data)
+    # color std selection & graph display
+    name_select = st.selectbox("Select Color", std_name)
+    std_i = std_name.index(name_select)
+    ref_low, ref_pts, ref_int = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_int[std_i])
+    ref_max = ref_low + ref_pts * ref_int
+    y_ref_val_list = str(list_ref_vals[std_i]).split(',')
+    x_wave_list = [k for k in range(ref_low, ref_max, ref_int)]
+    sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])
+    sd_df[name_select] = sd_df[name_select].astype('float64')
+    st.line_chart(sd_df)
+    color = st.color_picker('Standard Color', '#00f900')
 except:
-    st.write("Unable to preview file !!")
-'''
+    st.write("Upload a file !")
