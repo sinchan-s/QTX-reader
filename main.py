@@ -7,7 +7,7 @@ from io import StringIO
 # basic configurations
 st.set_page_config(
     page_title="QTX reader",
-    page_icon="Q",
+    page_icon="🔹",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -44,4 +44,4 @@ try:
     st.line_chart(sd_df)
     color = st.color_picker('Standard Color', '#00f900')
 except:
-    st.write("Upload a file !")
+    st.write("Upload a QTX file !")
