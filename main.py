@@ -41,7 +41,8 @@ try:
     x_wave_list = [k for k in range(ref_low, ref_max, ref_int)]
     sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])
     sd_df[name_select] = sd_df[name_select].astype('float64')
-    st.line_chart(sd_df)
-    color = st.color_picker('Standard Color', '#00f900')
+    col1, col2 = st.columns(2)
+    col1.line_chart(sd_df)
+    color = col2.color_picker('Standard Color', '#00f900')
 except:
     st.write("Upload a QTX file !")
