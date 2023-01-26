@@ -9,15 +9,13 @@ st.set_page_config(
     page_title="QTX reader",
     page_icon="🔹",
     layout="wide",
-    initial_sidebar_state="collapsed",
-)
+    initial_sidebar_state="collapsed")
 
 st.header("QTX file reader & color-graph display")
 
 
 # QTX file uploader
-qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=False,
-                            help="Only upload QTX file")
+qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=False, help="Only supports single file upload")
 
 # QTX file opener
 try:
@@ -45,4 +43,4 @@ try:
     col1.line_chart(sd_df)
     color = col2.color_picker('Standard Color', '#00f900')
 except:
-    st.write("Upload a QTX file !")
+    st.write("Waiting for your upload !")
