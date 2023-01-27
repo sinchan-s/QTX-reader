@@ -40,7 +40,7 @@ try:
     sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])
     sd_df[name_select] = sd_df[name_select].astype('float64')
     col1, col2 = st.columns(2)
-    col1.line_chart(sd_df)
-    color = col2.color_picker('Standard Color', '#00f900')
+    col1.area_chart(sd_df)
+    color = col2.color_picker('Standard Color', '#ffffff')
 except:
     st.write("Waiting for your upload !")
