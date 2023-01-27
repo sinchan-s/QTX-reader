@@ -15,14 +15,17 @@ st.header("QTX file reader & color-graph display")
 
 
 # QTX file uploader
-qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=False, help="Only supports single file upload")
-
+qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=True, help="Supports multiple files upload")
+#st.write(qtx_file)
 # QTX file opener
 try:
     # converting qtx data to raw string
-    stringio = StringIO(qtx_file.getvalue().decode("utf-8"))
-    string_data = stringio.read()
+    
     with st.expander('Raw data: ', expanded=False):
+        string_data = ""
+        for f in qtx_file:
+            stringio = StringIO(f.getvalue().decode("utf-8"))
+            string_data = string_data + '\n' + stringio.read()
         st.write(string_data)
     # values extraction using regex
     std_name = re.findall("STD_NAME=(.+)", string_data)
