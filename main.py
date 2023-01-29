@@ -31,15 +31,15 @@ try:
     std_name = re.findall("STD_NAME=(.+)", string_data)
     list_ref_low = re.findall("STD_REFLLOW=(\d+),", string_data)
     list_ref_pts = re.findall("STD_REFLPOINTS=(\d+),", string_data)
-    list_ref_int = re.findall("STD_REFLINTERVAL=(\d+),", string_data)
+    list_ref_inter = re.findall("STD_REFLINTERVAL=(\d+),", string_data)
     list_ref_vals = re.findall("STD_R[=,](.+)", string_data)
     # color std selection & graph display
     name_select = st.selectbox("Select Color", std_name)
     std_i = std_name.index(name_select)
-    ref_low, ref_pts, ref_int = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_int[std_i])
-    ref_max = ref_low + ref_pts * ref_int
+    ref_low, ref_pts, ref_inter = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_inter[std_i])
+    ref_high = ref_low + ref_pts * ref_inter
     y_ref_val_list = str(list_ref_vals[std_i]).split(',')
-    x_wave_list = [k for k in range(ref_low, ref_max, ref_int)]
+    x_wave_list = list(range(ref_low, ref_high, ref_inter))
     sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])
     sd_df[name_select] = sd_df[name_select].astype('float64')
     col1, col2 = st.columns(2)
