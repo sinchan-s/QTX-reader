@@ -16,16 +16,20 @@ st.header("QTX file reader & color-graph display")
 
 #! QTX file uploader
 qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=True, help="Supports multiple files upload")
-d65 = pd.read_csv('d65.csv').set_index('wavelength')
-d65_max = d65['ref_val'].max()
-d65['std_D65'] = d65['ref_val'].apply(lambda x:x*100/d65_max)
-d65 = d65.drop('ref_val', axis=1)
-inca = pd.read_csv('inca.csv').set_index('wavelength')
-inca_max = inca['ref_val'].max()
-inca['std_INCA'] = inca['ref_val'].apply(lambda x:x*100/inca_max)
-inca = inca.drop('ref_val', axis=1)
-merged_illum = d65.join(inca, on='wavelength', how='right')
-#st.dataframe(merged_illum)
+
+#! std illuminants for comparison
+def illum(name):
+    df = pd.read_csv(name).set_index('wavelength')
+    df_max = df['ref_val'].max()
+    df['std_'] = df['ref_val'].apply(lambda x:x*100/df_max)
+    df = df.drop('ref_val', axis=1)
+    return df
+
+d65 = illum('d65.csv')
+inca = illum('inca.csv')
+merged_illum = d65.join(inca, on='wavelength', how='right', lsuffix='D65', rsuffix='INCA')
+#st.dataframe(inca)
+
 #! QTX file opener
 try:
     #! converting qtx data to raw string
