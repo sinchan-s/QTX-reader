@@ -17,8 +17,14 @@ st.header("QTX file reader & color-graph display")
 #! QTX file uploader
 qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=True, help="Supports multiple files upload")
 d65 = pd.read_csv('d65.csv').set_index('wavelength')
+d65_max = d65['ref_val'].max()
+d65['std_D65'] = d65['ref_val'].apply(lambda x:x*100/d65_max)
+d65 = d65.drop('ref_val', axis=1)
 inca = pd.read_csv('inca.csv').set_index('wavelength')
-merged_illum = d65.join(inca, on='wavelength', how='left', lsuffix='_D65', rsuffix='_INCA')
+inca_max = inca['ref_val'].max()
+inca['std_INCA'] = inca['ref_val'].apply(lambda x:x*100/inca_max)
+inca = inca.drop('ref_val', axis=1)
+merged_illum = d65.join(inca, on='wavelength', how='right')
 #st.dataframe(merged_illum)
 #! QTX file opener
 try:
@@ -44,8 +50,8 @@ try:
     x_wave_list = list(range(ref_low, ref_high, ref_inter))
     sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])
     sd_df[name_select] = sd_df[name_select].astype('float64')
-    combi_df = sd_df.join(merged_illum, how='left', lsuffix='_std', rsuffix='_illum')
-    #st.dataframe(combi_df)
+    combi_df = merged_illum.join(sd_df, how='right', lsuffix='_std', rsuffix='_illum')
+    st.dataframe(combi_df)
     #! columnized sections
     col1, col2 = st.columns(2)
     col1.line_chart(combi_df)
