@@ -36,8 +36,9 @@ try:
     list_ref_pts = re.findall("STD_REFLPOINTS=(\d+),", string_data)
     list_ref_inter = re.findall("STD_REFLINTERVAL=(\d+),", string_data)
     list_ref_vals = re.findall("STD_R[=,](.+)", string_data)
-    #! color std selection & graph display
-    name_select = st.selectbox("Select Color Std", std_name)
+    #! color std selection & pre-display processing section
+    col1, col2, col3 = st.columns(3)
+    name_select = col1.selectbox("Select Color Std", std_name)
     std_i = std_name.index(name_select)
     ref_low, ref_pts, ref_inter = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_inter[std_i])
     ref_high = ref_low + ref_pts * ref_inter
@@ -46,16 +47,20 @@ try:
     sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])
     sd_df[name_select] = sd_df[name_select].astype('float64')
     combi_df = merged_illum.join(sd_df, how='right')
+    color = col2.color_picker('Color Display (wip)', '#ffffff')
     #st.dataframe(combi_df)
-    #! columnized sections
-    col1, col2 = st.columns(2)
-    if st.checkbox("relative to std"):
-        col_modify = [col for col in combi_df.columns if 'ref_val' in col]
-        combi_df['illum_D65'] = combi_df['ref_val_D65'].apply(lambda x:x*100/combi_df['ref_val_D65'].max())
-        combi_df['illum_INCA'] = combi_df['ref_val_INCA'].apply(lambda x:x*100/combi_df['ref_val_INCA'].max())
-        combi_df = combi_df.drop(['ref_val_D65', 'ref_val_INCA'], axis=1)
-    st.line_chart(combi_df)
-    #color = st.color_picker('Standard Color', '#ffffff')
+    #! data display section    
+    if col2.checkbox("Illuminant relative to std"):
+        for col in combi_df.columns:
+            if 'ref_val' in col:
+                col_new = 'illum'+col[7:]
+                combi_df[col_new] = combi_df[col].apply(lambda x:x*100/combi_df[col].max())
+                combi_df = combi_df.drop(col, axis=1)
+    if col1.checkbox("Show Illuminants"):
+        st.line_chart(combi_df)
+    else:
+        st.line_chart(sd_df)
+    #! qtx raw data display 
     with st.expander('Raw data: ', expanded=False):
         st.write(string_data)
 except:
