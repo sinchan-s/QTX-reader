@@ -59,7 +59,8 @@ try:
         col2.line_chart(combi_df)
     else:
         col2.line_chart(sd_df)
-    col1.dataframe(combi_df)
+    with col1.expander('Table', expanded=False):
+        st.dataframe(combi_df)
     #! qtx raw data display 
     with st.expander('Raw data: ', expanded=False):
         st.write(string_data)
