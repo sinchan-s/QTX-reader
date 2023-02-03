@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import re
 import streamlit as st
 from io import StringIO
+from bokeh.plotting import figure
 
 #! basic configurations
 st.set_page_config(
@@ -58,9 +59,12 @@ try:
     if col1.checkbox("Show Illuminants"):
         col2.line_chart(combi_df)
     else:
-        col2.line_chart(sd_df)
+        col2.area_chart(sd_df)
     with col1.expander('Table', expanded=False):
         st.dataframe(combi_df)
+    #p = figure(title='chart',x_axis_label='Wavelength()',y_axis_label='Reflectance(%)')
+    #p.line(x='wavelength', y='ref_val_D65', source=combi_df, legend_label='Trend', line_width=2)
+    #st.bokeh_chart(p, use_container_width=True)
     #! qtx raw data display 
     with st.expander('Raw data: ', expanded=False):
         st.write(string_data)
