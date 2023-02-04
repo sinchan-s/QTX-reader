@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import re
 import streamlit as st
 from io import StringIO
-from bokeh.plotting import figure
+from bokeh.plotting import figure, output_file, show
 
 #! basic configurations
 st.set_page_config(
@@ -49,22 +49,29 @@ try:
     sd_df[name_select] = sd_df[name_select].astype('float64')
     combi_df = merged_illum.join(sd_df, how='right')
     color = col2.color_picker('Color Display (wip)', '#ffffff')
-    #! data display section    
+    #! Illuminant spectra relative to Color std spectra    
     if col2.checkbox("Illuminant relative to std"):
         for col in combi_df.columns:
             if 'ref_val' in col:
                 col_new = col[8:]+'_relative'
-                combi_df[col_new] = combi_df[col].apply(lambda x:x*100/combi_df[col].max())
-                combi_df = combi_df.drop(col, axis=1)
+                combi_df[col] = combi_df[col].apply(lambda x:x*100/combi_df[col].max())
+                #combi_df = combi_df.drop(col, axis=1)
+    #! Toggle to show illuminants
     if col1.checkbox("Show Illuminants"):
-        col2.line_chart(combi_df)
+        p = figure(width=600, height=300, background_fill_color="#fafafa")
+        x = combi_df.index
+        for i, j in enumerate(combi_df.columns):    
+            y = combi_df.iloc[:, i]
+            p.line(x, y, line_width=i+1)
+        col2.bokeh_chart(p)
     else:
-        col2.area_chart(sd_df)
+        p = figure(width=600, height=300, background_fill_color="#fafafa")
+        x = sd_df.index
+        y = sd_df.iloc[:, 0]
+        p.line(x, y, line_width=3)
+        col2.bokeh_chart(p)
     with col1.expander('Table', expanded=False):
         st.dataframe(combi_df)
-    #p = figure(title='chart',x_axis_label='Wavelength()',y_axis_label='Reflectance(%)')
-    #p.line(x='wavelength', y='ref_val_D65', source=combi_df, legend_label='Trend', line_width=2)
-    #st.bokeh_chart(p, use_container_width=True)
     #! qtx raw data display 
     with st.expander('Raw data: ', expanded=False):
         st.write(string_data)
