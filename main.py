@@ -31,12 +31,14 @@ try:
     for f in qtx_file:
         stringio = StringIO(f.getvalue().decode("utf-8"))
         string_data = string_data + '\n' + stringio.read()
+
     #! values extraction using regex
     std_name = re.findall("STD_NAME=(.+)", string_data)
     list_ref_low = re.findall("STD_REFLLOW=(\d+),", string_data)
     list_ref_pts = re.findall("STD_REFLPOINTS=(\d+),", string_data)
     list_ref_inter = re.findall("STD_REFLINTERVAL=(\d+),", string_data)
     list_ref_vals = re.findall("STD_R[=,](.+)", string_data)
+
     #! color std selection & pre-display processing section
     col1, col2 = st.columns(2)
     name_select = col1.selectbox("Select Color Std", std_name)
@@ -49,29 +51,34 @@ try:
     sd_df[name_select] = sd_df[name_select].astype('float64')
     combi_df = merged_illum.join(sd_df, how='right')
     color = col2.color_picker('Color Display (wip)', '#ffffff')
+
     #! Illuminant spectra relative to Color std spectra    
     if col2.checkbox("Illuminant relative to std"):
         for col in combi_df.columns:
             if 'ref_val' in col:
                 col_new = col[8:]+'_relative'
                 combi_df[col] = combi_df[col].apply(lambda x:x*100/combi_df[col].max())
-                #combi_df = combi_df.drop(col, axis=1)
+                
     #! Toggle to show illuminants
     if col1.checkbox("Show Illuminants"):
         p = figure(width=600, height=300, background_fill_color="#fafafa")
         x = combi_df.index
         for i, j in enumerate(combi_df.columns):    
             y = combi_df.iloc[:, i]
-            p.line(x, y, line_width=i+1)
+            if j == combi_df.columns[-1]:
+                p.line(x, y, line_width=i+1, color="#c02942")
+            else:
+                p.line(x, y, line_width=i+1)
         col2.bokeh_chart(p)
     else:
         p = figure(width=600, height=300, background_fill_color="#fafafa")
         x = sd_df.index
         y = sd_df.iloc[:, 0]
-        p.line(x, y, line_width=3)
+        p.line(x, y, line_width=3, color="#c02942")
         col2.bokeh_chart(p)
     with col1.expander('Table', expanded=False):
         st.dataframe(combi_df)
+        
     #! qtx raw data display 
     with st.expander('Raw data: ', expanded=False):
         st.write(string_data)
