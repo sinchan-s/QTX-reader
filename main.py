@@ -71,7 +71,7 @@ try:
                 p.line(x, y, line_width=i+1)
         col2.bokeh_chart(p)
     else:
-        p = figure(width=600, height=300, background_fill_color="#fafafa")
+        p = figure(width=600, height=300, background_fill_color="#fafafa", x_range=(360, 700), y_range=(0, 100))
         x = sd_df.index
         y = sd_df.iloc[:, 0]
         p.line(x, y, line_width=3, color="#c02942")
