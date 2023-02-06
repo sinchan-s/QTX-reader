@@ -53,7 +53,7 @@ try:
     color = col2.color_picker('Color Display (wip)', '#ffffff')
 
     #! Illuminant spectra relative to Color std spectra    
-    if col2.checkbox("Illuminant relative to std"):
+    if col2.checkbox("Allign all"):
         for col in combi_df.columns:
             if 'ref_val' in col:
                 col_new = col[8:]+'_relative'
@@ -61,7 +61,7 @@ try:
                 
     #! Toggle to show illuminants
     if col1.checkbox("Show Illuminants"):
-        p = figure(width=600, height=300, background_fill_color="#fafafa")
+        p = figure(width=600, height=300, background_fill_color="#fafafa", x_range=(360, 700), y_range=(0, 100))
         x = combi_df.index
         for i, j in enumerate(combi_df.columns):    
             y = combi_df.iloc[:, i]
@@ -78,7 +78,7 @@ try:
         col2.bokeh_chart(p)
     with col1.expander('Table', expanded=False):
         st.dataframe(combi_df)
-        
+
     #! qtx raw data display 
     with st.expander('Raw data: ', expanded=False):
         st.write(string_data)
