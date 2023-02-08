@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import re
 import streamlit as st
 from io import StringIO
+from bokeh.io import curdoc
 from bokeh.plotting import figure, output_file, show
 
 #! basic configurations
@@ -12,6 +13,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed")
 
+#! App header
 st.header("QTX file reader & color-graph display")
 
 
@@ -61,7 +63,15 @@ try:
                 
     #! Toggle to show illuminants
     if col1.checkbox("Show Illuminants"):
-        p = figure(width=600, height=300, background_fill_color="#fafafa", x_range=(360, 700), y_range=(0, 100))
+        p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', x_range=(360, 700), y_range=(0, 100))
+        p.xaxis.axis_label = "Wavelength(λ)"
+        p.xaxis.axis_label_text_color = "white"
+        p.xaxis.axis_line_color = "white"
+        p.xaxis.major_label_text_color = "white"
+        p.yaxis.axis_label = "Reflectance(%)"
+        p.yaxis.axis_label_text_color = "white"
+        p.yaxis.axis_line_color = "white"
+        p.yaxis.major_label_text_color = "white"
         x = combi_df.index
         for i, j in enumerate(combi_df.columns):    
             y = combi_df.iloc[:, i]
@@ -71,7 +81,15 @@ try:
                 p.line(x, y, line_width=i+1)
         col2.bokeh_chart(p)
     else:
-        p = figure(width=600, height=300, background_fill_color="#fafafa", x_range=(360, 700), y_range=(0, 100))
+        p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', x_range=(360, 700), y_range=(0, 100))
+        p.xaxis.axis_label = "Wavelength(λ)"
+        p.xaxis.axis_label_text_color = "white"
+        p.xaxis.axis_line_color = "white"
+        p.xaxis.major_label_text_color = "white"
+        p.yaxis.axis_label = "Reflectance(%)"
+        p.yaxis.axis_label_text_color = "white"
+        p.yaxis.axis_line_color = "white"
+        p.yaxis.major_label_text_color = "white"
         x = sd_df.index
         y = sd_df.iloc[:, 0]
         p.line(x, y, line_width=3, color="#c02942")
