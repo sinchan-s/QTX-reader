@@ -60,17 +60,18 @@ try:
             if 'ref_val' in col:
                 col_new = col[8:]+'_relative'
                 combi_df[col] = combi_df[col].apply(lambda x:x*100/combi_df[col].max())
-                
+
     #! Toggle to show illuminants
     if col1.checkbox("Show Illuminants"):
         p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', x_range=(360, 700), y_range=(0, 100))
+        p.outline_line_color = "white"
+        p.outline_line_width = 5
+        p.outline_line_alpha = 1
         p.xaxis.axis_label = "Wavelength(λ)"
         p.xaxis.axis_label_text_color = "white"
-        p.xaxis.axis_line_color = "white"
         p.xaxis.major_label_text_color = "white"
         p.yaxis.axis_label = "Reflectance(%)"
         p.yaxis.axis_label_text_color = "white"
-        p.yaxis.axis_line_color = "white"
         p.yaxis.major_label_text_color = "white"
         x = combi_df.index
         for i, j in enumerate(combi_df.columns):    
@@ -82,18 +83,20 @@ try:
         col2.bokeh_chart(p)
     else:
         p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', x_range=(360, 700), y_range=(0, 100))
+        p.outline_line_color = "white"
+        p.outline_line_width = 5
+        p.outline_line_alpha = 1
         p.xaxis.axis_label = "Wavelength(λ)"
         p.xaxis.axis_label_text_color = "white"
-        p.xaxis.axis_line_color = "white"
         p.xaxis.major_label_text_color = "white"
         p.yaxis.axis_label = "Reflectance(%)"
         p.yaxis.axis_label_text_color = "white"
-        p.yaxis.axis_line_color = "white"
         p.yaxis.major_label_text_color = "white"
         x = sd_df.index
         y = sd_df.iloc[:, 0]
         p.line(x, y, line_width=3, color="#c02942")
         col2.bokeh_chart(p)
+
     with col1.expander('Table', expanded=False):
         st.dataframe(combi_df)
 
