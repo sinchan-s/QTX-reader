@@ -34,12 +34,16 @@ try:
         stringio = StringIO(f.getvalue().decode("utf-8"))                               #? extracting & decoding every line to utf-8
         string_data = string_data + '\n' + stringio.read()                              #? appending string variable
 
+    #! qtx raw data display 
+    with st.expander('Raw data: ', expanded=False):                                     #? displaying raw data of color std
+        st.write(string_data)
+    
     #! values extraction using regex
     std_name = re.findall("STD_NAME=(.+)", string_data)                                 #? extracting the color stds name
     list_ref_low = re.findall("STD_REFLLOW=(\d+),", string_data)                        #? lowest wavelength value
     list_ref_pts = re.findall("STD_REFLPOINTS=(\d+),", string_data)                     #? total wavelength points
     list_ref_inter = re.findall("STD_REFLINTERVAL=(\d+),", string_data)                 #? interval between wavelengths
-    list_ref_vals = re.findall("STD_R=(.+)[,\s]", string_data)                          #? reflectance values match
+    list_ref_vals = re.findall("BAT_R=|STD_R=(.+)[,\s]", string_data)                          #? reflectance values match
     #st.write(list_ref_vals.strip(','))
 
     #! color std selection & pre-display processing section
@@ -48,7 +52,7 @@ try:
     std_i = std_name.index(name_select)                                                 #? selected index of std
     ref_low, ref_pts, ref_inter = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_inter[std_i])        #? int:variable assignment to std data points
     ref_high = ref_low + ref_pts * ref_inter                                            #? highest wavelength calculation
-    y_ref_val_list = str(list_ref_vals[std_i]).split(',')                               #? assigning 'y' for dataframe
+    y_ref_val_list = [rval for rval in list_ref_vals[std_i].split(',') if rval.strip()] #? assigning 'y' for dataframe
     x_wave_list = list(range(ref_low, ref_high, ref_inter))                             #? assigning 'x' for dataframe
     sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])      #? dataframing 'x' & 'y'
     sd_df[name_select] = sd_df[name_select].astype('float64')                           #? converting ref values to float 
@@ -80,7 +84,7 @@ try:
             if j == combi_df.columns[-1]:                                               #? check for color std ref values column
                 p.line(x, y, line_width=3, color="#01f700")                             #? line plot
             else:
-                p.line(x, y, line_width=2, color="#007c7c")
+                p.line(x, y, line_width=2, color="#8b1302")
         col2.bokeh_chart(p)
     else:
         p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', y_range=(0, 100))
@@ -101,8 +105,5 @@ try:
     with col1.expander('Table', expanded=False):                                        #? displaying dataframe
         st.dataframe(combi_df)
 
-    #! qtx raw data display 
-    with st.expander('Raw data: ', expanded=False):                                     #? displaying raw data of color std
-        st.write(string_data)
 except:
     st.write("Waiting for your upload !")                                               #? exception handling
