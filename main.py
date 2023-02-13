@@ -15,7 +15,7 @@ st.set_page_config(
 
 #! App header
 st.header("QTX file reader & color-graph display")
-
+bokehColors = ['brown', 'maroon', 'darkolivegreen']
 
 #! QTX file uploader
 qtx_file = st.file_uploader("Upload QTX format file only:", type=['qtx'], accept_multiple_files=True, help="Supports multiple files upload")
@@ -62,7 +62,7 @@ try:
 
     #! Toggle to show illuminants
     p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', y_range=(0, 100))
-    p.outline_line_color = "white"                                          #? plot styling elements
+    p.outline_line_color = "white"                                              #? plot axis & outline styling elements
     p.outline_line_width = 5
     p.outline_line_alpha = 1
     p.xaxis.axis_label = "Wavelength(λ)"
@@ -71,25 +71,25 @@ try:
     p.yaxis.axis_label = "Reflectance(%)"
     p.yaxis.axis_label_text_color = "white"
     p.yaxis.major_label_text_color = "white"
-    x = combi_df.index                                                      #? assigning 'x' value
-    if col1.checkbox("Show Illuminants"):                                   #? checkbox for showing std illuminants
-        for i, col in enumerate(combi_df.columns):                          #? looping over every column in combi_df
-            if col != name_select:                                          #? checking 'ref_val' columns
-                combi_df[col] = combi_df[col].apply(lambda x:x*100/combi_df[col].max()) #? applying the relative function on 'ref_val' columns
-                y = combi_df.iloc[:, i]                                     #? assigning 'y' value
-                p.line(x, y, line_width=2, color="#7f0000", legend_label=col) #? line plot for every illuminant
+    x = combi_df.index                                                          #? assigning 'x' value
+    if col1.checkbox("Show Illuminants"):                                       #? checkbox for showing std illuminants
+        for i, (column, color) in enumerate(zip(combi_df.columns, bokehColors)):#? looping over every column in combi_df
+            if column != name_select:                                              #? checking 'ref_val' columns
+                combi_df[column] = combi_df[column].apply(lambda x:x*100/combi_df[column].max()) #? applying the relative function on 'ref_val' columns
+                y = combi_df.iloc[:, i]                                         #? assigning 'y' value
+                p.line(x, y, line_width=2, color=color, legend_label=column)    #? line plot for every illuminant
         p.line(x, y=combi_df[name_select], line_width=3, color="#01f700", legend_label=name_select) #? line plot for only color std
     else:
-        y = combi_df[name_select]                                           #? assigning 'y' value
-        p.line(x, y, line_width=3, color="#01f700", legend_label=name_select) #? line plot for only color std
-    p.legend.location = "top_left"
+        y = combi_df[name_select]                                               #? assigning 'y' value
+        p.line(x, y, line_width=3, color="#01f700", legend_label=name_select)   #? line plot for only color std
+    p.legend.location = "top_left"                                              #? plot legend styling elements
     p.legend.label_text_color = "white"
     p.legend.border_line_width = 1
     p.legend.border_line_color = "white"
     p.legend.border_line_alpha = 0.5
     p.legend.background_fill_color = "white"
     p.legend.background_fill_alpha = 0.1
-    col2.bokeh_chart(p)
+    col2.bokeh_chart(p)                                                     #? bokeh plot display
 
     #! tabular data
     with col1.expander('Table', expanded=False):                            #? displaying dataframe
