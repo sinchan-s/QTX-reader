@@ -49,16 +49,18 @@ try:
 
     #! color std selection & pre-display processing section
     col1, col2 = st.columns(2)                                                          #? making two columns
-    name_select = col1.selectbox("Select Color Std", std_name)                          #? stds list display
-    std_i = std_name.index(name_select)                                                 #? selected index of std
-    ref_low, ref_pts, ref_inter = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_inter[std_i])        #? int:variable assignment to std data points
-    ref_high = ref_low + ref_pts * ref_inter                                            #? highest wavelength calculation
-    y_ref_val_list = [rval for rval in list_ref_vals[std_i].split(',') if rval.strip()] #? assigning 'y' for dataframe
-    x_wave_list = list(range(ref_low, ref_high, ref_inter))                             #? assigning 'x' for dataframe
-    sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])      #? dataframing 'x' & 'y'
-    sd_df[name_select] = sd_df[name_select].astype('float64')                           #? converting ref values to float 
-    combi_df = merged_illum.join(sd_df, how='right')                                    #? color display(wip)
-    color = col2.color_picker('Color Display (wip)', '#ffffff')
+    with col1:
+        name_select = st.selectbox("Select Color Std", std_name)                          #? stds list display
+        std_i = std_name.index(name_select)                                                 #? selected index of std
+        ref_low, ref_pts, ref_inter = int(list_ref_low[std_i]), int(list_ref_pts[std_i]), int(list_ref_inter[std_i])        #? int:variable assignment to std data points
+        ref_high = ref_low + ref_pts * ref_inter                                            #? highest wavelength calculation
+        y_ref_val_list = [rval for rval in list_ref_vals[std_i].split(',') if rval.strip()] #? assigning 'y' for dataframe
+        x_wave_list = list(range(ref_low, ref_high, ref_inter))                             #? assigning 'x' for dataframe
+        sd_df = pd.DataFrame(y_ref_val_list, index=x_wave_list, columns=[name_select])      #? dataframing 'x' & 'y'
+        sd_df[name_select] = sd_df[name_select].astype('float64')                           #? converting ref values to float 
+        combi_df = merged_illum.join(sd_df, how='right')                                    #? color display(wip)
+    with col2:
+        color = st.color_picker('Color Display (wip)', '#ffffff')
 
     #! Toggle to show illuminants
     p = figure(width=600, height=300, background_fill_color="#0e1118", border_fill_color='#0e1118', outline_line_color='#ffffff', y_range=(0, 100))
@@ -71,17 +73,18 @@ try:
     p.yaxis.axis_label = "Reflectance(%)"
     p.yaxis.axis_label_text_color = "white"
     p.yaxis.major_label_text_color = "white"
-    x = combi_df.index                                                          #? assigning 'x' value
-    if col1.checkbox("Show Illuminants"):                                       #? checkbox for showing std illuminants
-        for i, (column, color) in enumerate(zip(combi_df.columns, bokehColors)):#? looping over every column in combi_df
-            if column != name_select:                                              #? checking 'ref_val' columns
-                combi_df[column] = combi_df[column].apply(lambda x:x*100/combi_df[column].max()) #? applying the relative function on 'ref_val' columns
-                y = combi_df.iloc[:, i]                                         #? assigning 'y' value
-                p.line(x, y, line_width=2, color=color, legend_label=column)    #? line plot for every illuminant
-        p.line(x, y=combi_df[name_select], line_width=3, color="#01f700", legend_label=name_select) #? line plot for only color std
-    else:
-        y = combi_df[name_select]                                               #? assigning 'y' value
-        p.line(x, y, line_width=3, color="#01f700", legend_label=name_select)   #? line plot for only color std
+    x = combi_df.index
+    with col1:                                                          #? assigning 'x' value
+        if st.checkbox("Show Illuminants"):                                       #? checkbox for showing std illuminants
+            for i, (column, color) in enumerate(zip(combi_df.columns, bokehColors)):#? looping over every column in combi_df
+                if column != name_select:                                              #? checking 'ref_val' columns
+                    combi_df[column] = combi_df[column].apply(lambda x:x*100/combi_df[column].max()) #? applying the relative function on 'ref_val' columns
+                    y = combi_df.iloc[:, i]                                         #? assigning 'y' value
+                    p.line(x, y, line_width=2, color=color, legend_label=column)    #? line plot for every illuminant
+            p.line(x, y=combi_df[name_select], line_width=3, color="#01f700", legend_label=name_select) #? line plot for only color std
+        else:
+            y = combi_df[name_select]                                               #? assigning 'y' value
+            p.line(x, y, line_width=3, color="#01f700", legend_label=name_select)   #? line plot for only color std
     p.legend.location = "top_left"                                              #? plot legend styling elements
     p.legend.label_text_color = "white"
     p.legend.border_line_width = 1
@@ -92,7 +95,7 @@ try:
     col2.bokeh_chart(p)                                                     #? bokeh plot display
 
     #! tabular data
-    with col1.expander('Table', expanded=False):                            #? displaying dataframe
+    with col1.expander('Spectral Table', expanded=False):                            #? displaying dataframe
         st.dataframe(combi_df)
 
 except:
