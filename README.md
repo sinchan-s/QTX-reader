@@ -1,6 +1,7 @@
 # QTX-reader
-Web-app to read qtx files & represent spectral graph with its corresponding color based on the reflectance values of the color standard. Contain illuminants: D65 & INCA in actual and relative reference as well helpful in assessing metamerism.   
-
+Web-app to read qtx files & represent spectral graph with its corresponding color based on the reflectance values of the color standard.   
+**Contain illuminants**: *D65* & *INCA* in actual and relative reference as well helpful in assessing metamerism.   
+   
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://sinx-qtx-reader.streamlit.app/)   
 
 ## Application preview   
